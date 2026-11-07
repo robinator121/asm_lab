@@ -23,5 +23,6 @@ these files are the following (the files may be subject to change. this is githu
 how to run:
 idk,  
 aarch64-linux-gnu-as 4.s -o 4.o
+aarch64-linux-gnu-ld 4.o -o 4
 qemu-aarch64 ./4; echo $?
 if it doesnt work, try checking your packages and maybe turning your pc off and on. (if you try running this on a computer thats turned off, please leave)
