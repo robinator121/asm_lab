@@ -8,25 +8,21 @@ arr:
 
 .text
 .global _start
-
 _start:
     ldr x0, =arr
-
     ld1 {v0.4s}, [x0], #16
-
-    mul v0.4s, v0.4s, v0.4s // first row
+    mul v0.4s, v0.4s, v0.4s // first 4 squared
     mov w1, #3
 
 loop:
     ld1 {v1.4s}, [x0], #16
-    mla v0.4s, v0.4s, v1.4s // v0 += v1 * v1, multiply accumulate. better than mul and add because its just one liner. but i do wonder if this is faster than mul and add
-
+    mla v0.4s, v1.4s, v1.4s // v0 += v1 * v1. not v0 * v1. i did that before lol
     subs w1, w1, #1
     b.ne loop
 
 done:
-    addv s2, v0.4s
-    fmov w0, s2
-
+    addv s2, v0.4s // sum of squares should be 15555
+    umov w0, v2.s[0]
+    // exit status is only 8 bits, so shell shows 195. not the whole 15555
     mov x8, #93
     svc #0

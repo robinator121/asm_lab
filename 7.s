@@ -1,46 +1,66 @@
 .data
 message:
     .asciz "fast-powered ARM processor"
+newline:
+    .ascii "\n"
 
 .text
 .global _start
-    ldr x0, =message
+_start:
     ldr x5, =message
-
-loop:
-    ldrb w2, [x0], #1 // what does it mean? we advance pointer itself? -> yes
-    cbnz w2, loop
-
     mov x0, x5
-    mov w3, #0 // a is 97, this is counter
 
-plus:
-    add w3, w3, #1
-    b acount
+// first find end. x0 points AFTER the zero byte once this finishes
+find_end:
+    ldrb w2, [x0], #1
+    cbnz w2, find_end
+    mov x7, x0 // save end+1 so write knows length later
+    sub x6, x0, #2 // last real character, not the null byte
 
+    // count lowercase 'a'. uppercase ARM does not count
+    mov x0, x5
+    mov w9, #0
 acount:
     ldrb w2, [x0], #1
-    sub w2, 97
-    cbz w2, plus
-    add w2, 97
-    cbz w2, finish
+    cbz w2, replace
+    cmp w2, #97
+    b.ne acount
+    add w9, w9, #1
+    b acount
 
-reset:
-    mov x5, x0
-
+// now reverse the bytes. x0 walks right, x1 walks left
 replace:
-    b loop
-    mov w4, #0
-    mov w3, #0
-    mov w6, #0
-    ldrb w3, [x0], w4
-    ldrb w6, [x5], w4
-    strb w6, [x0], w4
-    strb w3, [x5], w4
-    add w4, w4, #1
+    mov x0, x5
+    mov x1, x6
+swap:
+    cmp x0, x1
+    b.hs finish
+    ldrb w3, [x0]
+    ldrb w4, [x1]
+    strb w4, [x0]
+    strb w3, [x1]
+    add x0, x0, #1
+    sub x1, x1, #1
+    b swap
 
+finish:
+    mov x0, #1
+    mov x1, x5
+    sub x2, x7, x5
+    sub x2, x2, #1 // do not print the null byte
+    mov x8, #64
+    svc #0
 
+    mov x0, #1
+    ldr x1, =newline
+    mov x2, #1
+    mov x8, #64
+    svc #0
 
-//end of code stuff wont be written here because the loops themselves would mess up addressing. in loop, we would basically return the sub x5, x0
+    // $? = number of lowercase a's (1 here)
+    mov w0, w9
+    mov x8, #93
+    svc #0
 
-//neon idea but neon problem. we read multiple bytes at the same time, very cool yes. but what if array is smaller than 4 or **is not divisible by 4???**
+// neon idea but neon problem: length must be known before loading 16 bytes
+// so do 16-byte chunks ONLY while 16 bytes remain. scalar handles tail
