@@ -30,3 +30,5 @@ if it doesnt work, try checking your packages and maybe turning your pc off and 
 fyi:
 this is my own personal area where i try, play and break computers (or my own sanity)
 please note that my unprofessional notes here are unprofessional because these are not meant to be in a professional capacity. professional capacity is professionally handled. userspace and kernelspace remains separated.
+
+also, what i learnt will be added after i learnt it
