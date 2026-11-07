@@ -21,4 +21,7 @@ these files are the following (the files may be subject to change. this is githu
 | 7.s | count lowercase 'a', reverse string in place with two pointers | prints `rossecorp MRA derewop-tsaf`, exit 1 |
 
 how to run:
-idk,   aarch64-linux-gnu-as 4.s -o 4.o should work
+idk,  
+aarch64-linux-gnu-as 4.s -o 4.o
+qemu-aarch64 ./4; echo $?
+if it doesnt work, try checking your packages and maybe turning your pc off and on. (if you try running this on a computer thats turned off, please leave)
